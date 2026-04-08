@@ -1,0 +1,23 @@
+[2025-04-08 10:15:22] Starting stage: 410 Games: Test Execution
+[2025-04-08 10:15:23] Running test suite on device...
+[2025-04-08 10:15:24] Device ID: ABC123
+[2025-04-08 10:15:25] Test framework version: 2.1.0
+[2025-04-08 10:15:30] Running test: test_render_basic
+[2025-04-08 10:15:35] PASS: test_render_basic (5.2s)
+[2025-04-08 10:15:36] Running test: test_vulkan_init
+[2025-04-08 10:15:40] PASS: test_vulkan_init (3.8s)
+[2025-04-08 10:15:41] Running test: test_gpu_memory_allocation
+[2025-04-08 10:15:50] FAILED: test_gpu_memory_allocation
+[2025-04-08 10:15:50] Error: Segmentation fault in gpu_alloc()
+[2025-04-08 10:15:51] Ramdump collected: https://storage.example.com/ramdumps/build-123/ramdump_20250408.bin
+[2025-04-08 10:15:52] vm link: https://vm-manager.example.com/instance/vm-abc-123
+[2025-04-08 10:15:53] Running test: test_shader_compile
+[2025-04-08 10:15:58] PASS: test_shader_compile (4.5s)
+[2025-04-08 10:15:59] Running test: test_texture_load
+[2025-04-08 10:16:05] CRASHED: test_texture_load
+[2025-04-08 10:16:05] Error: Out of memory during texture allocation
+[2025-04-08 10:16:06] Running test: test_frame_render
+[2025-04-08 10:16:10] PASS: test_frame_render (3.2s)
+[2025-04-08 10:16:11] Test Results: 4 passed, 2 failed, 0 skipped
+[2025-04-08 10:16:12] Report generated: https://reports.example.com/build-123/test-report.html
+[2025-04-08 10:16:13] Stage completed with status: FAILED

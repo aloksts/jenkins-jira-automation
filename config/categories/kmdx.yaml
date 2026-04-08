@@ -1,0 +1,30 @@
+# =============================================================================
+# KMDX Category Configuration
+# =============================================================================
+
+category: kmdx
+pattern: "kmdx_"
+
+default_stages:
+  - Environment Setup
+  - Copy Scripts
+  - Clone Repositories
+  - "Repository Init (sub-modules & deps)"
+  - Codebase Configuration
+  - Build
+  - "Test-Only: Device Verification"
+  - Device Preparation
+  - Test Execution
+  - Report Generation
+  - "Declarative: Post Actions"
+
+default_stage_poc: "pavan7.vs@partner.saung.com"
+
+stage_poc_overrides: {}
+
+jobs: {}
+  # Add KMDX jobs here following the sandbox.yaml schema
+  # job_name:
+  #   stages: []
+  #   stage_poc: "email@partner.saung.com"
+  #   ramdump_required: true/false

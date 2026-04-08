@@ -1,0 +1,22 @@
+[2025-04-08 10:15:22] Starting stage: 410 Games: Test Execution
+[2025-04-08 10:15:23] Running test suite on device...
+[2025-04-08 10:15:24] Device ID: DEF456
+[2025-04-08 10:15:25] Test framework version: 2.1.0
+[2025-04-08 10:15:30] Running test: test_game_launch
+[2025-04-08 10:15:35] PASS: test_game_launch (5.0s)
+[2025-04-08 10:15:36] Running test: test_game_render
+[2025-04-08 10:15:44] FAILED: test_game_render
+[2025-04-08 10:15:44] Error: Rendering pipeline assertion failed
+[2025-04-08 10:15:44] Expected: frame_count > 0
+[2025-04-08 10:15:44] Got: frame_count = 0
+[2025-04-08 10:15:45] Running test: test_game_input
+[2025-04-08 10:15:50] PASS: test_game_input (4.8s)
+[2025-04-08 10:15:51] Running test: test_game_audio
+[2025-04-08 10:15:56] FAILED: test_game_audio
+[2025-04-08 10:15:56] Error in test_game_audio: Audio device not initialized
+[2025-04-08 10:15:57] Running test: test_game_save
+[2025-04-08 10:16:02] PASS: test_game_save (4.5s)
+[2025-04-08 10:16:03] Test Results: 3 passed, 2 failed, 0 skipped
+[2025-04-08 10:16:04] Report link: https://reports.example.com/build-456/test-report.html
+[2025-04-08 10:16:05] Artifact: https://artifacts.example.com/build-456/logs.tar.gz
+[2025-04-08 10:16:06] Stage completed with status: FAILED

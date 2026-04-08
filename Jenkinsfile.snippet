@@ -1,0 +1,117 @@
+// =============================================================================
+// Jenkinsfile Snippet — Add to your pipeline's post block
+// =============================================================================
+//
+// This snippet triggers automatic Jira ticket creation when a pipeline
+// job fails. Add this to any Jenkinsfile that should auto-file tickets.
+//
+// Prerequisites:
+//   1. Python 3.9+ installed on the Jenkins agent
+//   2. jenkins-jira-automation project deployed at AUTOMATION_SCRIPT_PATH
+//   3. Jenkins credentials configured (see Environment section below)
+//
+// =============================================================================
+
+// ─── Option 1: Inline post block (add to each Jenkinsfile) ──────────────────
+
+pipeline {
+    agent any
+
+    environment {
+        // Path to the automation script on the Jenkins agent
+        AUTOMATION_SCRIPT_PATH = '/opt/jenkins-jira-automation'
+
+        // Category for this pipeline — UPDATE per pipeline
+        JIRA_CATEGORY = 'sandbox'
+
+        // Jenkins credentials (use Jenkins Credentials Store)
+        JENKINS_URL       = "${env.JENKINS_URL}"
+        JENKINS_USER      = credentials('jenkins-api-user')
+        JENKINS_API_TOKEN = credentials('jenkins-api-token')
+        JIRA_URL          = credentials('jira-url')
+        JIRA_USER         = credentials('jira-api-user')
+        JIRA_API_TOKEN    = credentials('jira-api-token')
+    }
+
+    stages {
+        // ... your existing stages ...
+    }
+
+    post {
+        failure {
+            script {
+                echo "🔴 Build failed — creating Jira ticket..."
+                sh """
+                    cd ${AUTOMATION_SCRIPT_PATH}
+                    python3 main.py \
+                        --category ${JIRA_CATEGORY} \
+                        --job ${env.JOB_NAME} \
+                        --build ${env.BUILD_NUMBER} \
+                        --verbose
+                """
+            }
+        }
+        unstable {
+            script {
+                echo "🟡 Build unstable — creating Jira ticket..."
+                sh """
+                    cd ${AUTOMATION_SCRIPT_PATH}
+                    python3 main.py \
+                        --category ${JIRA_CATEGORY} \
+                        --job ${env.JOB_NAME} \
+                        --build ${env.BUILD_NUMBER} \
+                        --verbose
+                """
+            }
+        }
+    }
+}
+
+
+// ─── Option 2: Shared Library function (recommended for many pipelines) ──────
+//
+// Create a shared library function that any pipeline can call.
+// File: vars/createJiraTicket.groovy
+//
+//   def call(Map config = [:]) {
+//       def category = config.get('category', env.JIRA_CATEGORY ?: 'sandbox')
+//       def scriptPath = config.get('scriptPath', '/opt/jenkins-jira-automation')
+//       def dryRun = config.get('dryRun', false)
+//
+//       def dryRunFlag = dryRun ? '--dry-run' : ''
+//
+//       sh """
+//           cd ${scriptPath}
+//           python3 main.py \
+//               --category ${category} \
+//               --job ${env.JOB_NAME} \
+//               --build ${env.BUILD_NUMBER} \
+//               ${dryRunFlag} \
+//               --verbose
+//       """
+//   }
+//
+// Usage in Jenkinsfile:
+//   post {
+//       failure {
+//           createJiraTicket(category: 'sandbox')
+//       }
+//   }
+
+
+// ─── Option 3: Pipeline annotation (for dynamic category detection) ─────────
+//
+// If your job naming convention encodes the category (e.g., sandbox_test_job),
+// the script can auto-detect the category:
+//
+//   post {
+//       failure {
+//           sh """
+//               cd /opt/jenkins-jira-automation
+//               python3 main.py \
+//                   --auto-detect \
+//                   --job ${env.JOB_NAME} \
+//                   --build ${env.BUILD_NUMBER}
+//           """
+//       }
+//   }

@@ -1,0 +1,89 @@
+# =============================================================================
+# Jenkins-Jira Automation — Global Settings
+# =============================================================================
+
+jira:
+  # REQUIRED: Update these to match your Jira instance
+  project_key: "JENKINS"
+  issue_type: "Bug"
+  default_priority: "High"
+  # Labels added to every ticket
+  base_labels:
+    - "jenkins-automation"
+    - "auto-filed"
+
+jenkins:
+  # Fallback base URL (overridden by JENKINS_URL env var)
+  base_url: "https://jenkins.example.com"
+  # Number of log tail lines to include in ticket
+  log_tail_lines: 50
+  # Max retries for API calls
+  max_retries: 3
+  retry_backoff_factor: 2
+
+# Regex patterns for extracting links from stage logs
+# Each pattern should have a named group 'url' for the link
+link_patterns:
+  ramdump: '(?i)ramdump[^\\n]*?(?P<url>https?://\\S+)'
+  report: '(?i)report[^\\n]*?(?P<url>https?://\\S+)'
+  vm_link: '(?i)vm[^\\n]*?link[^\\n]*?(?P<url>https?://\\S+)'
+  artifact: '(?i)artifact[^\\n]*?(?P<url>https?://\\S+)'
+
+# Regex patterns for detecting crashed/failed tests
+test_failure_patterns:
+  - '(?i)FAIL(?:ED)?:\\s*(?P<test>\\S+)'
+  - '(?i)CRASH(?:ED)?:\\s*(?P<test>\\S+)'
+  - '(?i)ERROR\\s+in\\s+(?P<test>\\S+)'
+  - '(?i)Test\\s+(?P<test>\\S+)\\s+FAILED'
+
+# Ticket body templates
+ticket_templates:
+  with_ramdump: |
+    Hi team,
+
+    A Jenkins job has failed and requires investigation.
+
+    *Job Details:*
+    ||Field||Value||
+    |Job|{job_name}|
+    |Build|[#{build_number}|{job_link}]|
+    |Category|{category}|
+    |Failed Stage|{failed_stage}|
+    |Status|FAILED|
+
+    *Links:*
+    - Job Link: {job_link}
+    - Ramdump Link: {ramdump_link}
+    - VM Link: {vm_link}
+
+    *Stage Log (last {log_tail_lines} lines):*
+    {noformat}{stage_log_tail}{noformat}
+
+  without_ramdump: |
+    Hi team,
+
+    A Jenkins job has failed and requires investigation.
+
+    *Job Details:*
+    ||Field||Value||
+    |Job|{job_name}|
+    |Build|[#{build_number}|{job_link}]|
+    |Category|{category}|
+    |Failed Stage|{failed_stage}|
+    |Status|FAILED|
+
+    *Links:*
+    - Job Link: {job_link}
+    - Report Link: {report_link}
+
+    *Testcases Crashed:*
+    {crashed_tests}
+
+    *Stage Log (last {log_tail_lines} lines):*
+    {noformat}{stage_log_tail}{noformat}
+
+# Duplicate detection
+duplicate_check:
+  enabled: true
+  # JQL template  — looks for open tickets for the same job+build
+  jql_template: 'project = {project_key} AND summary ~ "{job_name}" AND summary ~ "#{build_number}" AND status not in (Closed, Done, Resolved)'

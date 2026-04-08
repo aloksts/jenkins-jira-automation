@@ -1,0 +1,59 @@
+# =============================================================================
+# Sandbox Category Configuration
+# =============================================================================
+
+category: sandbox
+pattern: "test_"
+
+# Default stages for all sandbox jobs (in pipeline execution order)
+default_stages:
+  - Environment Setup
+  - Copy Scripts
+  - "Conditional: SUMD/ANGLE Builds"
+  - Clone Repositories
+  - "Repository Init (sub-modules & deps)"
+  - Codebase Configuration
+  - Build SUMD
+  - Build SUMD SOCL
+  - Build ANGLE
+  - Revert Patches
+  - "Test-Only: Device Verification"
+  - BSP Preparation
+  - Device Flashing
+  - Device Preparation
+  - "Conditional: UMD Artifacts Flashing"
+  - "Conditional: Test Execution"
+  - "Declarative: Post Actions"
+
+# Default POC for all stages in this category (unless overridden)
+default_stage_poc: "pavan7.vs@partner.saung.com"
+
+# Override POC for specific default stages
+# Maps stage name → assignee email
+stage_poc_overrides:
+  # Example:
+  # "Build SUMD": "build-team@partner.saung.com"
+  # "Device Flashing": "device-team@partner.saung.com"
+
+# Per-job configuration
+jobs:
+  ngkmd_410_game_custom_test:
+    # Job-specific stages (appended after default_stages)
+    stages:
+      - "410 Games: Cleanup Previous Reports"
+      - "410 Games: Test Execution"
+      - "410 Games: Report Generation"
+    # POC for the job-specific stages above
+    stage_poc: "alok.pg@partner.saung.com"
+    ramdump_required: false
+
+  # -----------------------------------------------------------------------
+  # Add more sandbox jobs below. Examples:
+  # -----------------------------------------------------------------------
+  # ngkmd_410_vulkan_test:
+  #   stages:
+  #     - "Vulkan: Test Setup"
+  #     - "Vulkan: Test Execution"
+  #     - "Vulkan: Report Generation"
+  #   stage_poc: "engineer@partner.saung.com"
+  #   ramdump_required: true

@@ -1,0 +1,32 @@
+# =============================================================================
+# Category Template — Copy this file and rename for each new category
+# =============================================================================
+# File: config/categories/<category_name>.yaml
+
+category: "<CATEGORY_NAME>"      # e.g., sandbox, kmdx, stc
+pattern: "<JOB_PREFIX>"          # e.g., "test_", "kmdx_"
+
+# Stages that are common to ALL jobs in this category (ordered as in pipeline)
+default_stages:
+  - Stage 1
+  - Stage 2
+  # ...add more stages
+
+# Default POC email for stages not explicitly overridden
+default_stage_poc: "default@partner.saung.com"
+
+# Override POC for specific default stages
+stage_poc_overrides:
+  # "Stage Name": "specific-poc@partner.saung.com"
+
+# Per-job configuration
+jobs:
+  # <job_name>:
+  #   # Extra stages specific to this job (appended after default_stages)
+  #   stages:
+  #     - "Job Specific Stage 1"
+  #     - "Job Specific Stage 2"
+  #   # POC for the job-specific stages
+  #   stage_poc: "job-poc@partner.saung.com"
+  #   # Whether this job produces ramdumps (affects ticket template)
+  #   ramdump_required: true
