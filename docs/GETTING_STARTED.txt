@@ -1,0 +1,124 @@
+================================================================================
+        GETTING STARTED — Jenkins-Jira Automation
+================================================================================
+
+STEP 1: Install Dependencies
+─────────────────────────────
+    pip3 install -r requirements.txt
+
+
+STEP 2: Set Environment Variables
+──────────────────────────────────
+Set these in your terminal, .bashrc, or Jenkins credentials:
+
+    # Jenkins
+    export JENKINS_URL="https://your-jenkins-server.com"
+    export JENKINS_USER="your-jenkins-username"
+    export JENKINS_API_TOKEN="your-jenkins-api-token"
+
+    # Jira
+    export JIRA_URL="https://your-jira.atlassian.net"
+    export JIRA_USER="your-email@example.com"
+    export JIRA_API_TOKEN="your-jira-api-token"
+
+How to get tokens:
+    - Jenkins: Jenkins → Your Profile → Configure → API Token → Add New Token
+    - Jira:    https://id.atlassian.com/manage-profile/security/api-tokens
+
+
+STEP 3: Update Jira Project Key
+─────────────────────────────────
+Open config/settings.yaml and change:
+
+    jira:
+      project_key: "YOUR_PROJECT_KEY"    # e.g., "QA", "DEVOPS", etc.
+      issue_type: "Bug"                  # or "Task", etc.
+
+
+STEP 4: Add Your Category Configs
+───────────────────────────────────
+For each of your categories (sandbox, kmdx, stc, etc.), create a YAML file:
+
+    cp config/categories/_template.yaml config/categories/YOUR_CATEGORY.yaml
+
+Fill in:
+    - category:          Category name (e.g., "sandbox")
+    - pattern:           Job name prefix (e.g., "test_")
+    - default_stages:    Common pipeline stages in order
+    - default_stage_poc: Default assignee email
+    - stage_poc_overrides: Override assignee for specific stages
+    - jobs:              Per-job config with:
+        - stages:           Job-specific stages
+        - stage_poc:        Assignee for job-specific stages
+        - ramdump_required: true/false (changes ticket template)
+
+See config/categories/sandbox.yaml for a working example.
+
+
+STEP 5: Validate Configuration
+────────────────────────────────
+    python3 main.py --validate-config
+
+This checks all YAML files for errors without connecting to Jenkins or Jira.
+
+
+STEP 6: Dry Run (No Ticket Created)
+─────────────────────────────────────
+    python3 main.py --dry-run -v --category sandbox --job YOUR_JOB --build BUILD_NUM
+
+This connects to Jenkins to fetch data but does NOT create a Jira ticket.
+It prints a full preview of what the ticket would look like.
+
+
+STEP 7: Run for Real
+──────────────────────
+    python3 main.py --category sandbox --job YOUR_JOB --build BUILD_NUM
+
+This creates an actual Jira ticket.
+
+
+STEP 8: Integrate with Jenkins Pipeline
+─────────────────────────────────────────
+Add this to your Jenkinsfile:
+
+    post {
+        failure {
+            sh """
+                cd /path/to/jenkins-jira-automation
+                python3 main.py \
+                    --category ${env.JIRA_CATEGORY} \
+                    --job ${env.JOB_NAME} \
+                    --build ${env.BUILD_NUMBER}
+            """
+        }
+    }
+
+See Jenkinsfile.snippet for more integration options.
+
+
+================================================================================
+        ALL CLI COMMANDS REFERENCE
+================================================================================
+
+# Specific build
+python3 main.py --category sandbox --job my_job --build 123
+
+# Latest failed build for a job
+python3 main.py --category sandbox --job my_job
+
+# All jobs in a category
+python3 main.py --category sandbox
+
+# Scan everything
+python3 main.py --scan-all
+
+# Dry run (preview only)
+python3 main.py --dry-run --category sandbox --job my_job --build 123
+
+# JSON output
+python3 main.py --json --category sandbox --job my_job --build 123
+
+# Run tests (offline, no Jenkins/Jira needed)
+python3 -m pytest tests/ -v
+
+================================================================================
